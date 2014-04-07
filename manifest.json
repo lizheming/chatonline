@@ -1,0 +1,24 @@
+{
+    "update_url": "https://clients2.google.com/service/update2/crx",
+    "name" : "SF ChatOnline", 
+    "description": "SegmentFault Online Chatroom",
+    "version" : "0.3",
+    "manifest_version" : 2,
+    "icons": {
+        "16": "./img/icon16.png",
+        "24": "./img/icon24.png",
+        "48": "./img/icon48.png",
+        "128": "./img/icon128.png"
+    },
+    "content_scripts" : [
+        {
+            "matches" : ["http://segmentfault.com/*", "http://*.segmentfault.com/*"], 
+            "js"      : ["jquery-2.0.3.min.js", "prettify.js", "Markdown.Converter.js", "emotion.js", "main.js"], 
+            "css"     : ["chatroom.css", "desert.css"],
+            "run_at"  : "document_end"
+        }
+    ],
+    "permissions": [
+        "http://*/*", "notifications"
+    ]
+}
