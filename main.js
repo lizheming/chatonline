@@ -68,7 +68,7 @@ $(document).on('keydown', function(e) {
 
 	/** Ctrl+Enter 换行支持 **/
 	var textarea = $('#chatroom .textarea');
-    if(e.ctrlKey && e.keyCode == '13') {
+    if(textarea.is(':focus') && e.ctrlKey && e.keyCode == '13') {
         e.preventDefault();
         var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
         textarea.val(textarea.val().substr(0,start)+'\n'+textarea.val().substr(end));
@@ -82,7 +82,7 @@ $(document).on('keydown', function(e) {
     }
 
     /** 发送消息 **/
-    if(!$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
+    if(textarea.is(':focus') && !$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
         e.preventDefault();
         $('#sendMessage').click();
     }
