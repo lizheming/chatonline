@@ -20,7 +20,7 @@ var heartBeat = function() {
     });
 };
 /** 定时发送心跳并获取最新消息 **/
-setInterval("heartBeat()", 2000);
+setInterval("heartBeat()", 5000);
 
 /** 打开关闭聊天窗口 **/
 $(document).on('click', '.header', function(){
@@ -73,7 +73,7 @@ $(document).on('keydown', '#chatroom .textarea', function(e) {
     }
 
     /** 发送消息 **/
-    if(!e.ctrlKey && e.keyCode == '13') {
+    if(!$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
         $('#sendMessage').click();
         return e.preventDefault();
     }
@@ -164,7 +164,7 @@ $(document).on('mousemove', function(e) {
         }
 
         if(!area.x && !area.y) {
-            this.style.cursor = 'auto';
+            chatroom.style.cursor = 'pointer';
         }
 })
 
@@ -200,7 +200,7 @@ setHtml = {
             at: '@',
             callbacks: {
                 remote_filter: function(query, callback) {
-                    $.get('http://x.segmentfault.com/autocomplete/user', {q: query}, function(o) {o=$.parseJSON(o.slice(6,-1));if (!o.status) callback(o.data);});
+                    $.get(server+'/x.php', {q: query, community: community}, function(o) {o = $.parseJSON(o);if (!o.status) callback(o.data)});
                 },
                 tpl_eval: function(tpl, item) {
                     return '<li data-value="@' + item.slug + '">' + (item.avatarUrl ? '<img class="avatar-24" src="' + item.avatarUrl + '" />': '') + item.name + ' &nbsp; <small>@' + item.slug + '</small>' + '</li>';

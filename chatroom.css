@@ -145,3 +145,6 @@
 	padding:15px 0;
 	line-height: 0;
 }
+#atwho-container div.atwho-view {
+	z-index:1000;
+}
