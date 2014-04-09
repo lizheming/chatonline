@@ -64,25 +64,27 @@ $(document).on('click', '#sendMessage', function() {
     })
 })
 /** 设置快捷键 **/
-$(document).on('keydown', '#chatroom .textarea', function(e) {
+$(document).on('keydown', function(e) {
 
+	/** Ctrl+Enter 换行支持 **/
+	var textarea = $('#chatroom .textarea');
     if(e.ctrlKey && e.keyCode == '13') {
         e.preventDefault();
-        var start = $(this)[0].selectionStart, end = $(this)[0].selectionEnd;
-        $(this).val($(this).val().substr(0,start)+'\n'+$(this).val().substr(end));
+        var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
+        textarea.val(textarea.val().substr(0,start)+'\n'+textarea.val().substr(end));
+    }
+
+    /** Tab支持 **/
+    if(textarea.is(':focus') && e.keyCode == '9') {
+        e.preventDefault();
+        var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
+        textarea.val(textarea.val().substr(0,start)+'    '+textarea.val().substr(end));
     }
 
     /** 发送消息 **/
     if(!$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
-        $('#sendMessage').click();
-        return e.preventDefault();
-    }
-
-    /** Tab支持 **/
-    if($(this).is(':focus') && e.keyCode == '9') {
         e.preventDefault();
-        var start = $(this)[0].selectionStart, end = $(this)[0].selectionEnd;
-        $(this).val($(this).val().substr(0,start)+'    '+$(this).val().substr(end));
+        $('#sendMessage').click();
     }
 
     /** 老板键 **/
