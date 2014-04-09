@@ -243,7 +243,7 @@ setHtml = {
             return color;
         }).join()+')';
 
-        var li = '<li data-time="'+data.time+'">'+
+        var li = '<li data-time="'+data.time+'" data-id="'+data.id+'">'+
                     '<div class="avatar" style="background:'+bg+';">'+data.name.split("")[0]+'</div>'+
                     '<em></em>'+
                     '<div class="body">'+
@@ -267,13 +267,13 @@ setHtml = {
             success: function(res) {
                 if(!res.success) return false;
                 res.data.forEach(function(list) {
-                    var lastest = $('.chatlist >li:last-child');
-                    if(lastest.attr('data-time') != list.time && lastest.text() != list.text) {
+                    /** 判断最后消息id防止载入重复消息进列表 **/
+                    if($('.chatlist >li:last-child').attr('data-id') != list.id) {
                         setHtml.append(list, function(html) {
                             chatlist.append(html);
                             chatlist[0].scrollTop = chatlist[0].scrollHeight;
                             setHtml.highlight();
-                        })
+                        })                        
                     }
                 })
                 setTimeout(setHtml.request, 500);
@@ -303,7 +303,7 @@ setHtml = {
     emotion: function() {
         var emlist = $('#emlist');
         yan.list.forEach(function(line) {
-            emlist.append('<span>'+line.yan[0]+'</span>');
+            line.yan.forEach(function(em,i) {if(i<10)emlist.append('<span>'+em+'</span>')});
         })
     },
     notification: function(name,text) {
