@@ -2,7 +2,7 @@
     "update_url": "https://clients2.google.com/service/update2/crx",
     "name" : "SF ChatOnline", 
     "description": "SegmentFault Online Chatroom",
-    "version" : "0.3",
+    "version" : "0.4",
     "manifest_version" : 2,
     "icons": {
         "16": "./img/icon16.png",
