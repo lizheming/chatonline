@@ -267,8 +267,7 @@ setHtml = {
             processData: false,
             timeout: 20000,
             success: function(res) {
-                if(!res.success) return false;
-                res.data.forEach(function(list) {
+                res.success && res.data.forEach(function(list) {
                     /** 判断最后消息id防止载入重复消息进列表 **/
                     if($('.chatlist >li:last-child').attr('data-id') != list.id) {
                         setHtml.append(list, function(html) {
