@@ -13,7 +13,7 @@ var user = (function() {
 /** 发送在线心跳并获取在线状态 **/
 var server = "http://chatonline.sinaapp.com", community = 'segmentfault';
 var heartBeat = function() {
-    if(document.hidden) return false; /**如果用户不看的话就不用做发送啦**/
+    if(document.hidden) return false; /** 如果用户不看的话就不用做发送啦 **/
     $.getJSON(server+'/online.php?community='+community+'&uuid='+user.uuid, function(res) {
     	var onlineWord = "当前有"+res.online+"个用户在线";
     	$('#chatroom').length > 0 ? $('#chatroom .status').html(onlineWord) : setHtml.start(onlineWord);
@@ -64,25 +64,36 @@ $(document).on('click', '#sendMessage', function() {
     })
 })
 /** 设置快捷键 **/
-$(document).on('keydown', function(e) {
+$(document).on('keydown', '#chatroom .textarea', function(e) {
+
+    if(e.ctrlKey && e.keyCode == '13') {
+        e.preventDefault();
+        var start = $(this)[0].selectionStart, end = $(this)[0].selectionEnd;
+        $(this).val($(this).val().substr(0,start)+'\n'+$(this).val().substr(end));
+    }
 
     /** 发送消息 **/
-    if(e.ctrlKey && e.keyCode == '13')
-        return $('#sendMessage').click();
+    if(!e.ctrlKey && e.keyCode == '13') {
+        $('#sendMessage').click();
+        return e.preventDefault();
+    }
 
     /** Tab支持 **/
-    var textarea = $('.textarea');
-    if(textarea.is(':focus') && e.keyCode == '9') {
+    if($(this).is(':focus') && e.keyCode == '9') {
         e.preventDefault();
-        textarea = $('.textarea');
-        textarea.val(textarea.val() + '    ');
-        textarea.blur();
-        textarea.focus();
+        var start = $(this)[0].selectionStart, end = $(this)[0].selectionEnd;
+        $(this).val($(this).val().substr(0,start)+'    '+$(this).val().substr(end));
     }
 
     /** 老板键 **/
-    if(e.ctrlKey && e.keyCode == '38' && !$('#chatroom').hasClass('active')) setHtml.open();
-    if(e.ctrlKey && e.keyCode == '40' && $('#chatroom').hasClass('active')) setHtml.close();
+    if(e.ctrlKey && e.keyCode == '38' && !$('#chatroom').hasClass('active')) {
+        e.preventDefault();
+        setHtml.open();
+    }
+    if(e.ctrlKey && e.keyCode == '40' && $('#chatroom').hasClass('active')) {
+        e.preventDefault();
+        setHtml.close();
+    }
 });
 $(document).on('click', '#chatroom a', function(e) {
     window.open($(this).attr('href'));
@@ -132,39 +143,75 @@ document.body.addEventListener('paste', function(e) {
         }
     }
 })
+/** 鼠标调整聊天窗口大小 **/
+$(document).on('mousemove', function(e) {
+    var chatroom = document.querySelector('#chatroom');
+    if(!chatroom) return false;
+    var mouse = {x: e.pageX, y: e.pageY},
+        limit = {x: chatroom.offsetLeft+chatroom.clientWidth, y:chatroom.offsetTop};
+    var area = {x: limit.x - 20 < mouse.x && limit.x + 20 > mouse.x, y: limit.y - 20 < mouse.y && limit.y + 20 > mouse.y};
+        /** 左右拉伸 **/
+        if(area.x && !area.y) {
+            chatroom.style.cursor = 'e-resize';
+        }
+        /** 上下拉伸 **/
+        if(!area.x && area.y) {
+            chatroom.style.cursor = 'n-resize';
+        }
+        /** 对角拉伸 **/
+        if(area.x && area.y) {
+            chatroom.style.cursor = 'ne-resize';
+        }
+
+        if(!area.x && !area.y) {
+            this.style.cursor = 'auto';
+        }
+})
 
 setHtml = {
-    start: function(onlineWord) {
-        var chatroom = $('<div id="chatroom"><audio id="notification" src="http://chatonline.sinaapp.com/notification.wav" preload /></div>'), 
-            header = $('<div class="header"></div>'),
-            onlineStatus = $('<div class="status"></div>'),
-            onlineAction = $('<i class="action"></i>');
-        onlineStatus.html(onlineWord);
-        header.html(onlineStatus);
-        header.append(onlineAction);
-        chatroom.append(header);
+    start: function(w) {
+        var chatroom = '<div id="chatroom">'+
+                            '<audio id="notification" src="http://chatonline.sinaapp.com/notification.wav" preload/>'+
+                            '<div class="header">'+
+                                '<div class="status">'+w+'</div>'+
+                                '<i class="action"></i>'+
+                            '</div>'+
+                        '</div>';
         $('body').append(chatroom);
     },
     open: function() {
-        var chatroom = $('#chatroom'),
-            chatbox = $('<div class="chatbox"></div>'),
-            sendbox = $('<div class="sendbox"></div>'),
-            chatlist = $('<ul class="chatlist"><li class="loading">正在导入消息请稍后...</li></ul>'),
-            sendtool = $('<div class="sendtool"></div>');
-        chatroom.addClass('active');
-        sendtool.html('<span id="embutton">>ω<</span><div id="emlist" class="display"></div>');
-        sendtool.append('<span id="uploadmessage"></span>');
-        sendtool.append('<span id="sendmessage"></span>');
-        sendbox.html(sendtool);
-        sendbox.append('<textarea class="textarea"></textarea>');
-        sendbox.append('<button id="sendMessage">发送<h6>Ctrl+Enter</h6></button>');
-        chatbox.html(chatlist);
-        chatbox.append(sendbox);
-        chatroom.append(chatbox);
+        var chatbox = '<div class="chatbox">'+
+                        '<ul class="chatlist">'+
+                            '<li class="loading">正在导入消息请稍后...</li>'+
+                        '</ul>'+
+                        '<div class="sendbox">'+
+                            '<div class="sendtool">'+
+                                '<span id="embutton">>ω<</span><div id="emlist" class="display"></div>'+
+                                '<span id="uploadmessage"></span>'+
+                                '<span id="sendmessage"></span>'+
+                            '</div>'+
+                            '<textarea class="form-control mono textarea-14 mousetrap textarea"></textarea>'+
+                            '<button id="sendMessage">发送<h6>(Enter)</h6></button>'+
+                        '</div>'+
+                    '</div>';
+        $('#chatroom').addClass('active').append(chatbox);
+        /** @ **/
+        $('.textarea').atwho({
+            at: '@',
+            callbacks: {
+                remote_filter: function(query, callback) {
+                    $.get('http://x.segmentfault.com/autocomplete/user', {q: query}, function(o) {o=$.parseJSON(o.slice(6,-1));if (!o.status) callback(o.data);});
+                },
+                tpl_eval: function(tpl, item) {
+                    return '<li data-value="@' + item.slug + '">' + (item.avatarUrl ? '<img class="avatar-24" src="' + item.avatarUrl + '" />': '') + item.name + ' &nbsp; <small>@' + item.slug + '</small>' + '</li>';
+                }
+            }
+        });
         setHtml.emotion();
         setHtml.getRecent(function() {
+            var chatlist = $('#chatroom .chatlist');
             chatlist[0].scrollTop = chatlist[0].scrollHeight;
-            $('.loading', chatlist).remove();
+            $('li.loading', chatlist).remove();
             chatlist.prepend('<li class="more">加载更多消息</li>');
             setHtml.request();
         });
@@ -174,24 +221,15 @@ setHtml = {
         $('#chatroom .chatbox').remove();
     },
     append: function(data, callback) {
-        var li = $('<li></li>'),
-            avatar = $('<div class="avatar"></div>'),
-            body = $('<div class="body"></div>'),
-            head = $('<div class="head"></div>'),
-            content = $('<div class="content"></div>');
         /** data.text 转义 **/
         /** Markdown **/
         var converter = new Markdown.Converter();
         data.text = converter.makeHtml(data.text);
-        content.html(data.text);
-        head.html(data.name);
-        if(data.hasOwnProperty('uuid') && data.uuid) head.append('<@'+data.uuid+'>');
-        var date = new Date(parseInt(data.time) * 1000), time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-        head.append(time);
-        li.attr('data-time', data.time);
-        body.append(head);
-        body.append(content);
-        avatar.html(data.name.split("")[0]);
+
+        var ht = data.name, date = new Date(parseInt(data.time) * 1000);
+        if(data.uuid) ht += '<@'+data.uuid+'>';
+        ht += date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
         /** 头像颜色 **/
         var rgbs = data.name.split("").map(function(i){return i.charCodeAt();}).join('');
         var bg = 'rgb('+['r','g','b'].map(function() {
@@ -204,13 +242,18 @@ setHtml = {
             }
             return color;
         }).join()+')';
-        avatar.css('background', bg);
-        li.html('<em></em>');
-        li.prepend(avatar);
-        li.append(body);
+
+        var li = '<li data-time="'+data.time+'">'+
+                    '<div class="avatar" style="background:'+bg+';">'+data.name.split("")[0]+'</div>'+
+                    '<em></em>'+
+                    '<div class="body">'+
+                        '<div class="head">'+ht+'</div>'+
+                        '<div class="content">'+data.text+'</div>'+
+                    '</div>'+
+                '</li>';
+        callback($(li));
         /** 增加消息通知 **/
         if(document.hidden) setHtml.notification(data.name,data.text)
-        callback(li);
     },
     request: function() {
         var chatlist=$('.chatlist'), time=$('.chatlist >li:last-child').attr('data-time');
@@ -222,37 +265,39 @@ setHtml = {
             processData: false,
             timeout: 20000,
             success: function(res) {
-                if(res.success) {
-                    res.data.forEach(function(list) {
-                        if($('.chatlist >li:last-child').attr('data-time') != list.time && $('.chatlist >li:last-child .content') != list.text)
-                            setHtml.append(list, function(html) {
-                                chatlist.append(html);
-                                chatlist[0].scrollTop = chatlist[0].scrollHeight;
-                                setHtml.highlight();
-                            })
-                    })
-                }
+                if(!res.success) return false;
+                res.data.forEach(function(list) {
+                    var lastest = $('.chatlist >li:last-child');
+                    if(lastest.attr('data-time') != list.time && lastest.text() != list.text) {
+                        setHtml.append(list, function(html) {
+                            chatlist.append(html);
+                            chatlist[0].scrollTop = chatlist[0].scrollHeight;
+                            setHtml.highlight();
+                        })
+                    }
+                })
                 setTimeout(setHtml.request, 500);
             }, 
             error: function(xmlrequest, status, error) {
-                if(status == 'timeout')
-                    setHtml.request();
+                if(status == 'timeout') setHtml.request();
             }
         })
     },
-    getRecent: function(callback, time, num) {
-        if(typeof num == "undefined") var num = 30;
-        if(typeof time == "undefined") var time = parseInt(new Date().getTime() / 1000);
+    getRecent: function() {
+        var c=arguments[0], 
+            num=arguments[1]?arguments[1]:30, 
+            time=arguments[2]?arguments[2]:(new Date().getTime() / 1000);
+
         $.getJSON(server+'/r.php?community='+community+'&max='+time+'&num='+num, function(lists) {
             if(!Array.isArray(lists)) return false;
             var chatlist = $('.chatlist');
             lists.forEach(function(list) {
                 setHtml.append(list, function(html) {
-                    chatlist.prepend(html)
+                    chatlist.prepend(html);
                     setHtml.highlight();
                 })
             })
-            callback();
+            c();
         })
     },
     emotion: function() {
@@ -262,14 +307,17 @@ setHtml = {
         })
     },
     notification: function(name,text) {
-        /** 语音提示 和 标题状态改变 **/
-        $('title').html(name+' 说...');
-        $('#chatroom #notification')[0].play();
+        /** 标题状态改变 **/
+        var o = $('title').text();
+        $('title').text('');
+        var note = setInterval(function() {$('title').text( $('title').text().length > 1 ? $('title').text().substr(1) : name+' 说...')}, 500);
+        setTimeout(function() {clearInterval(note);$('title').text(o)}, 10000);
+        /** 语音提示 **/
+        document.querySelector('#chatroom #notification').play();
         /** 消息通知 **/
-        if(notification) return false;
-        if(Notification.permission != 'granted') {
+        if(!Notification) return false;
+        if(Notification.permission != 'granted')
             Notification.requestPermission(setHtml.notification);
-        }
         var notification = new Notification(name+' 说:', {
             'dir': 'ltr',
             'lang': 'zh-CN',
@@ -277,13 +325,19 @@ setHtml = {
             'tag': "ChatOnlineOn"+community,
             'icon': server+'/'+community+'.png'
         });
-        notification.onclick = function() {this.close()};
-        notification.onshow = function() {setTimeout(this.close, 2000)}
+        notification.onclose = function() {clearInterval(note);$('title').text(o)}
+        /** 点击后想增加一个跳转到该页面的代码 **/
+        notification.onclick = function() {this.close()}
+        notification.onshow = function() {setTimeout(notification.close, 10000)}
     },
     highlight: function () {
-        var pre = document.querySelectorAll('#chatroom pre');
-        for(i=0,l=pre.length;i<l;i++) pre[i].className += " prettyprint";
-        prettyPrint();
+        $('#chatroom pre').each(function() {
+            if(!$(this).hasClass('prettyprint')) {
+                $(this).html($(this).text()); //坑爹的转义
+                $(this).addClass('prettyprint');
+                prettyPrint();
+            }
+        });
     }
 }
 

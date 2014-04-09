@@ -10,7 +10,7 @@
 	bottom: -1px;
 	padding: 10px 14px;
 	border: 1px solid #AAA;
-	background: #f3f6f5;
+	background: #FEFEFE;
 	color: #333;
 	z-index: 999;
 	transition: all 0.2s;
@@ -57,6 +57,7 @@
 	margin:5% 0;
 	list-style-type: none;
 	overflow-y:auto;
+	overflow-x: hidden;
 }
 #chatroom .chatbox .chatlist li {
 	margin-bottom:20px;
@@ -75,20 +76,21 @@
 	font-size:14px;
 	background:green;
 	color:#FFF;
+	border-radius:2px 2px 2px 2px;
 }
 #chatroom .chatbox .chatlist em {
 	float:left;
 	width:0;
 	height:0;
-	border-top:5px solid #ADFF2F;
-	border-right:5px solid #ADFF2F;
+	border-top:5px solid #CDE9F5;
+	border-right:5px solid #CDE9F5;
 	border-left:5px solid transparent;
 	border-bottom:5px solid transparent;
 }
 #chatroom .chatbox .chatlist .body {
 	margin-left:39px;
 	padding:3px 8px;
-	background:#ADFF2F;
+	background:#CDE9F5;
 }
 #chatroom .chatbox .chatlist .head {
 	font-size:12px;
@@ -97,6 +99,7 @@
 }
 #chatroom .chatbox .chatlist .content {
 	padding-top:10px;
+	word-break: break-word;
 }
 #chatroom .sendbox {
 	width:100%;

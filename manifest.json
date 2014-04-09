@@ -13,7 +13,7 @@
     "content_scripts" : [
         {
             "matches" : ["http://segmentfault.com/*", "http://*.segmentfault.com/*"], 
-            "js"      : ["jquery-2.0.3.min.js", "prettify.js", "Markdown.Converter.js", "emotion.js", "main.js"], 
+            "js"      : ["jquery-2.0.3.min.js", "prettify.js", "Markdown.Converter.js", "emotion.js", "at.js", "main.js"], 
             "css"     : ["chatroom.css", "desert.css"],
             "run_at"  : "document_end"
         }
