@@ -25,7 +25,7 @@ setInterval("heartBeat()", 5000);
 /** 打开关闭聊天窗口 **/
 $(document).on('click', '.header', function(){
 	$(this).parent().hasClass('active') ? setHtml.close() : setHtml.open();
-})
+});
 /** 颜文字 **/
 $(document).on('click', '#embutton', function() {
     var emlist = $(this).next();
@@ -62,7 +62,7 @@ $(document).on('click', '#sendMessage', function() {
             $('.textarea').val('');
         }
     })
-})
+});
 /** 设置快捷键 **/
 $(document).on('keydown', function(e) {
 
@@ -100,8 +100,7 @@ $(document).on('keydown', function(e) {
 $(document).on('click', '#chatroom a', function(e) {
     window.open($(this).attr('href'));
     e.preventDefault();
-})
-
+});
 /** 加载更多消息 **/
 $(document).on('click', '#chatroom .more', function() {
     var more = $(this);
@@ -112,7 +111,7 @@ $(document).on('click', '#chatroom .more', function() {
         chatlist[0].scrollTop = scrollHeightAfter - scrollHeightBefore;
         chatlist.prepend(more);
     }, $('.chatlist >li:first-child').attr('data-time'), 40);
-})
+});
 /** 粘贴上传图片 **/
 document.body.addEventListener('paste', function(e) {
     var clipboard = e.clipboardData;
@@ -144,7 +143,7 @@ document.body.addEventListener('paste', function(e) {
             e.preventDefault();
         }
     }
-})
+});
 /** 鼠标调整聊天窗口大小 **/
 $(document).on('mousemove', function(e) {
     var chatroom = document.querySelector('#chatroom');
@@ -168,8 +167,7 @@ $(document).on('mousemove', function(e) {
         if(!area.x && !area.y) {
             chatroom.style.cursor = 'pointer';
         }
-})
-
+});
 setHtml = {
     start: function(w) {
         var chatroom = '<div id="chatroom">'+
@@ -258,9 +256,9 @@ setHtml = {
         if(document.hidden) setHtml.notification(data.name,data.text)
     },
     request: function() {
-        var chatlist=$('.chatlist'), time=$('.chatlist >li:last-child').attr('data-time');
+        var chatlist=$('.chatlist'), id=$('.chatlist >li:last-child').attr('data-id');
         $.ajax({
-            url: server+'/l.php?community='+community+'&start='+time+'&o=40',
+            url: server+'/l.php?community='+community+'&start='+id+'&o=40',
             type: 'GET',
             dataType: 'json',
             contentType: false,
@@ -268,8 +266,8 @@ setHtml = {
             timeout: 20000,
             success: function(res) {
                 res.success && res.data.forEach(function(list) {
-                    /** 判断最后消息id防止载入重复消息进列表 **/
-                    if($('.chatlist >li:last-child').attr('data-id') != list.id) {
+                    /** 判断消息id防止载入重复消息进列表 **/
+                    if($('.chatlist li[data-id="'+list.id+'"]').length == 0) {
                         setHtml.append(list, function(html) {
                             chatlist.append(html);
                             chatlist[0].scrollTop = chatlist[0].scrollHeight;
