@@ -120,33 +120,36 @@ $(document).on('click', '#sendMessage', function() {
 (function(key) {
 	chrome.storage.sync.get(key, function(d) {
 		if(!d.hasOwnProperty(key) || d[key] == '0') {
-			var quickey = function(e) {
-				if(!$(this).is(':focus')) return false;
+            $(document).on('keypress', '#chatroom .textarea', function(e) {
+                if(!$(this).is(':focus')) return false;
 
                 /** Enter 发送消息 **/
                 if(!$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
                     e.preventDefault();
                     return $('#sendMessage').click();
-                }   
+                }               
+            })
 
+            $(document).on('keydown', '#chatroom .textarea', function(e) {
                 /** Ctrl+Enter 换行支持 **/
                 if(e.ctrlKey && e.keyCode == '13') {
                     e.preventDefault();
                     var start = this.selectionStart, end = this.selectionEnd;
                     $(this).val($(this).val().substr(0,start)+'\n'+$(this).val().substr(end));
-                }
-			}
+                }                
+            })
 		} else {
-			var quickey = function(e) {
+            $(document).on('keydown', '#chatroom .textarea', function(e) {
+                if(!$(this).is(':focus')) return false;
+
                 /** Ctrl+Enter 发送消息 **/
                 if(e.ctrlKey && e.keyCode == '13')
                     return $('#sendMessage').click();   				
-			}
+			});
 		}
-		$(document).on('keypress', '#chatroom .textarea', quickey);
 	})
 }('sendkey'));
-$(document).on('keypress', '#chatroom .textarea', function(e) {
+$(document).on('keydown', '#chatroom .textarea', function(e) {
     /** Tab支持 **/
     if($(this).is(':focus') && e.keyCode == '9') {
         e.preventDefault();
@@ -155,9 +158,11 @@ $(document).on('keypress', '#chatroom .textarea', function(e) {
     }
 
     /** 上键发重复消息 **/
+    /**
     if($(this).val() == '' && e.keyCode == '38') {
     	$(this).val($('.chatlist >li:last-child .content').html());
     }
+    **/
 });
 /** 老板键 **/
 $(document).on('keydown', function(e) {
