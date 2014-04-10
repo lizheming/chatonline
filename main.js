@@ -127,8 +127,12 @@ $(document).on('click', '#chatroom .more', function() {
         scrollHeightAfter = chatlist[0].scrollHeight;
         chatlist[0].scrollTop = scrollHeightAfter - scrollHeightBefore;
         chatlist.prepend(more);
-    }, $('.chatlist >li:first-child').attr('data-time'), 40);
+    }, $('.chatlist >li:first-child').attr('data-id'), 40);
 });
+/** 清屏 **/
+$(document).on('click', '#chatroom #clscreen', function() {
+	$('.chatlist').html($('.chatlist .more'));
+})
 /** 粘贴上传图片 **/
 document.body.addEventListener('paste', function(e) {
     var clipboard = e.clipboardData;
@@ -216,6 +220,7 @@ setHtml = {
                         '<div class="sendbox">'+
                             '<div class="sendtool">'+
                                 '<span id="embutton">>ω<</span><div id="emlist" class="display"></div>'+
+                                '<span id="clscreen">清</span>'+
                                 '<span id="uploadmessage"></span>'+
                                 '<span id="sendmessage"></span>'+
                             '</div>'+
@@ -244,6 +249,7 @@ setHtml = {
             chatlist[0].scrollTop = chatlist[0].scrollHeight;
             $('li.loading', chatlist).remove();
             chatlist.prepend('<li class="more">加载更多消息</li>');
+            chatlist.attr('data-latest', $('.chatlist >li:last-child').attr('data-id'));
             setHtml.request();
         });
         /** 自定义消息背景 **/
@@ -295,7 +301,7 @@ setHtml = {
         if(document.hidden) setHtml.notification(data.name,data.text)
     },
     request: function() {
-        var chatlist=$('.chatlist'), id=$('.chatlist >li:last-child').attr('data-id');
+        var chatlist=$('.chatlist'), id=chatlist.attr('data-latest');
         $.ajax({
             url: server+'/l.php?community='+community+'&start='+id+'&o=40',
             type: 'GET',
@@ -311,9 +317,10 @@ setHtml = {
                             chatlist.append(html);
                             chatlist[0].scrollTop = chatlist[0].scrollHeight;
                             setHtml.highlight();
-                        })                        
+                        })                      
+                        chatlist.attr('data-latest', list.id);  
                     }
-                })
+                });
                 setTimeout(setHtml.request, 500);
             }, 
             error: function(xmlrequest, status, error) {
@@ -323,10 +330,10 @@ setHtml = {
     },
     getRecent: function() {
         var c=arguments[0], 
-            num=arguments[1]?arguments[1]:30, 
-            time=arguments[2]?arguments[2]:(new Date().getTime() / 1000);
+        	id=arguments[1]?'&end='+arguments[1]:'';
+            num=arguments[2]?arguments[2]:30;
 
-        $.getJSON(server+'/r.php?community='+community+'&max='+time+'&num='+num, function(lists) {
+        $.getJSON(server+'/r.php?community='+community+id+'&num='+num, function(lists) {
             if(!Array.isArray(lists)) return false;
             var chatlist = $('.chatlist');
             lists.forEach(function(list) {
