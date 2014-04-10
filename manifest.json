@@ -19,6 +19,7 @@
         }
     ],
     "permissions": [
-        "http://*/*", "notifications"
-    ]
+        "http://*/*", "notifications", "storage"
+    ],
+    "options_page": "options.html"
 }

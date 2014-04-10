@@ -37,7 +37,7 @@
 #chatroom.active {
 	left: -1px;
 	width: 350px;
-	height: 80%;
+	height: 700px;
 }
 #chatroom.active i.action {
 	background-position: -100px -100px;
@@ -110,12 +110,12 @@
 }
 #chatroom .sendbox #emlist {
 	font-size:9px;
-	overflow:hidden;
+	overflow-y:auto;
 	position: fixed;
 	background: #FFF;
-	margin-top:-625px;
-	height: 600px;
-	width: 1000px;
+	margin-top:-425px;
+	height: 400px;
+	width: 300px;
 	padding: 20px 10px;
 	border: 1px solid #AAA;
 	border-radius:5px 5px 5px 5px;
@@ -149,4 +149,46 @@
 }
 #atwho-container div.atwho-view {
 	z-index:1000;
+}
+.atwho-view-ul {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    margin-top: -1px;
+    border: 1px solid#CCC;
+    background: #FFF;
+    width: 100 % ;
+    color: #666
+}
+.atwho-view-ul li {
+    padding: 0 8px;
+    height: 32px;
+    line-height: 32px;
+    cursor: pointer
+}
+.atwho-view-ul li strong {
+    color: #333
+}
+.atwho-view-ul li small {
+    color: #999
+}
+.atwho-view-ul li img {
+    margin-right: 10px;
+    vertical-align: middle
+}
+.atwho-view-ul li.cur,
+.atwho-view-ul li.current,
+.atwho-view-ul li: hover,
+.atwho-view-ul li: active {
+    background: #EEE
+}
+.atwho-view-ul {
+    display: block;
+    width: auto;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+#atwho-container {
+    max-width: 300px
 }

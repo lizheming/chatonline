@@ -38,6 +38,13 @@ $(document).on('click', '#emlist span', function() {
     textarea[0].focus();
     textarea[0].selectionStart =textarea[0].selectionEnd = textarea.val().length;
 });
+/** 点击头像添加@ **/
+$(document).on('click', '#chatroom .avatar', function() {
+    var textarea = $('.textarea');
+    textarea.val(textarea.val() + '@'+$(this).attr('data-user')+' ');
+    textarea[0].focus();
+    textarea[0].selectionStart =textarea[0].selectionEnd = textarea.val().length;
+});
 /** 发送消息 **/
 $(document).on('click', '#sendMessage', function() {
     user.text = $('.textarea').val();
@@ -65,26 +72,36 @@ $(document).on('click', '#sendMessage', function() {
 });
 /** 设置快捷键 **/
 $(document).on('keydown', function(e) {
+    var textarea = $('#chatroom .textarea');
+    (function(key) {
+        chrome.storage.sync.get(key, function(d) {
+            if(!d.hasOwnProperty(key) || d[key] == "0") {
+                /** Enter 发送消息 **/
+                if(textarea.is(':focus') && !$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
+                    e.preventDefault();
+                    $('#sendMessage').click();
+                }   
 
-	/** Ctrl+Enter 换行支持 **/
-	var textarea = $('#chatroom .textarea');
-    if(textarea.is(':focus') && e.ctrlKey && e.keyCode == '13') {
-        e.preventDefault();
-        var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
-        textarea.val(textarea.val().substr(0,start)+'\n'+textarea.val().substr(end));
-    }
+                /** Ctrl+Enter 换行支持 **/
+                if(textarea.is(':focus') && e.ctrlKey && e.keyCode == '13') {
+                    e.preventDefault();
+                    var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
+                    textarea.val(textarea.val().substr(0,start)+'\n'+textarea.val().substr(end));
+                }
+            } else {
+
+                /** Ctrl+Enter 发送消息 **/
+                if(e.ctrlKey && e.keyCode == '13')
+                    return $('#sendMessage').click();                
+            }
+        })
+    }('sendkey'));
 
     /** Tab支持 **/
     if(textarea.is(':focus') && e.keyCode == '9') {
         e.preventDefault();
         var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
         textarea.val(textarea.val().substr(0,start)+'    '+textarea.val().substr(end));
-    }
-
-    /** 发送消息 **/
-    if(textarea.is(':focus') && !$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
-        e.preventDefault();
-        $('#sendMessage').click();
     }
 
     /** 老板键 **/
@@ -146,27 +163,39 @@ document.body.addEventListener('paste', function(e) {
 });
 /** 鼠标调整聊天窗口大小 **/
 $(document).on('mousemove', function(e) {
-    var chatroom = document.querySelector('#chatroom');
+    var chatroom = document.querySelector('#chatroom.active');
     if(!chatroom) return false;
     var mouse = {x: e.pageX, y: e.pageY},
         limit = {x: chatroom.offsetLeft+chatroom.clientWidth, y:chatroom.offsetTop};
-    var area = {x: limit.x - 20 < mouse.x && limit.x + 20 > mouse.x, y: limit.y - 20 < mouse.y && limit.y + 20 > mouse.y};
-        /** 左右拉伸 **/
-        if(area.x && !area.y) {
-            chatroom.style.cursor = 'e-resize';
-        }
-        /** 上下拉伸 **/
-        if(!area.x && area.y) {
-            chatroom.style.cursor = 'n-resize';
-        }
-        /** 对角拉伸 **/
-        if(area.x && area.y) {
-            chatroom.style.cursor = 'ne-resize';
-        }
+    var area = {x: limit.x - 10 < mouse.x && limit.x + 10 > mouse.x, y: limit.y - 10 < mouse.y && limit.y + 10 > mouse.y};
+    /** 左右拉伸 **/
+    if(area.x && !area.y) {
+        chatroom.style.cursor = 'e-resize';
+    }
+    /** 上下拉伸 **/
+    if(!area.x && area.y) {
+        chatroom.style.cursor = 'n-resize';
+    }
+    /** 对角拉伸 **/
+    if(area.x && area.y) {
+        chatroom.style.cursor = 'ne-resize';
+    }
 
-        if(!area.x && !area.y) {
-            chatroom.style.cursor = 'pointer';
+    if(!area.x && !area.y) {
+        chatroom.style.cursor = 'pointer';
+    }
+
+    /** 鼠标移除透明对话框 **/
+    chrome.storage.sync.get(['aero', 'opacity'], function(d) {
+        if(d.aero == "1") {
+            if($(chatroom).hasClass('active') && ( mouse.x > limit.x || mouse.y < limit.y) ) {
+                chatroom.style.opacity = d.opacity;
+            } else {
+                chatroom.style.opacity = 1;
+            }            
         }
+    })
+
 });
 setHtml = {
     start: function(w) {
@@ -191,10 +220,12 @@ setHtml = {
                                 '<span id="sendmessage"></span>'+
                             '</div>'+
                             '<textarea class="form-control mono textarea-14 mousetrap textarea"></textarea>'+
-                            '<button id="sendMessage">发送<h6>(Enter)</h6></button>'+
+                            '<button id="sendMessage">发送<h6>Enter</h6></button>'+
                         '</div>'+
                     '</div>';
         $('#chatroom').addClass('active').append(chatbox);
+        /** 快捷键显示 **/
+        chrome.storage.sync.get('sendkey', function(d){if(d.sendkey == "1") $('#sendMessage h6').html('Ctrl+Enter')})
         /** @ **/
         $('.textarea').atwho({
             at: '@',
@@ -215,6 +246,14 @@ setHtml = {
             chatlist.prepend('<li class="more">加载更多消息</li>');
             setHtml.request();
         });
+        /** 自定义消息背景 **/
+        (function(key) {
+            chrome.storage.sync.get(key, function(d) {
+                if(!d.hasOwnProperty(key)) return false;
+                if($('#msgOption').length > 0) $('#msgOption').remove();
+                $('body').append('<style id="msgOption" type="text/css">#chatroom .chatbox .chatlist em{border-top-color:'+d[key]+';border-right-color:'+d[key]+';}#chatroom .chatbox .chatlist div.body{background:'+d[key]+';}</style>');
+            })
+        }('msgbg'));
     },
     close: function() {
         $('#chatroom').removeClass('active');
@@ -244,7 +283,7 @@ setHtml = {
         }).join()+')';
 
         var li = '<li data-time="'+data.time+'" data-id="'+data.id+'">'+
-                    '<div class="avatar" style="background:'+bg+';">'+data.name.split("")[0]+'</div>'+
+                    '<div class="avatar" data-user="'+data.name+'" style="background:'+bg+';">'+data.name.split("")[0]+'</div>'+
                     '<em></em>'+
                     '<div class="body">'+
                         '<div class="head">'+ht+'</div>'+
@@ -339,4 +378,3 @@ setHtml = {
         });
     }
 }
-

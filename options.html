@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SF ChatOnline扩展选项</title>
+    <style type="text/css">
+    label {display:block;margin:10px 0;}
+    </style>
+</head>
+<body>
+    <form>
+        <label>
+            设置聊天消息背景:
+            <input class="op" type="color" id="msgbg" name="msgbg" value="#CDE9F5"/>
+        </label>
+        <label>
+            发送消息快捷键:
+            <select class="op" name="sendkey" value="0">
+                <option value="0">Enter</option>
+                <option value="1">Ctrl+Enter</option>
+            </select>
+        </label>
+        <label>
+            鼠标离开聊天窗口透明:
+            <span><input class="op" name="aero" type="radio" value="0" checked="true" />不透明</span>
+            <span><input class="op" name="aero" type="radio" value="1" />透明</span>
+        </label>
+        <label>
+            窗口透明度:
+            <input class="op" type="range" name="opacity" min="0" max="100" value="100">
+            <span class="opacity">1</span>
+        </label>
+		<button id="save">保存</button>
+		<button id="reset">设置为默认值</button>
+		<span id="message"></span>
+    </form>
+    <script type="text/javascript" src="options.js"></script>
+</body>
+</html>
