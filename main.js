@@ -14,7 +14,8 @@ var user = (function() {
 var server = "http://chatonline.sinaapp.com", community = 'segmentfault';
 var heartBeat = function() {
     if(document.hidden) return false; /** 如果用户不看的话就不用做发送啦 **/
-    $.getJSON(server+'/online.php?community='+community+'&uuid='+user.uuid, function(res) {
+    $.getJSON(server+'/online.php?community='+community+'&uuid='+user.uuid+'&user='+user.name, function(res) {
+    	onlineUsers = res.users;
     	var onlineWord = "当前有"+res.online+"个用户在线";
     	$('#chatroom').length > 0 ? $('#chatroom .status').html(onlineWord) : setHtml.start(onlineWord);
     });
@@ -45,6 +46,12 @@ $(document).on('click', '#chatroom .avatar', function() {
     textarea[0].focus();
     textarea[0].selectionStart =textarea[0].selectionEnd = textarea.val().length;
 });
+$(document).on('click', '#chatroom .onlineList', function() {
+    var textarea = $('.textarea');
+    textarea.val(textarea.val() + '@'+$(this).text()+' ');
+    textarea[0].focus();
+    textarea[0].selectionStart =textarea[0].selectionEnd = textarea.val().length;	
+})
 /** 发送消息 **/
 $(document).on('click', '#sendMessage', function() {
     user.text = $('.textarea').val();
@@ -52,6 +59,45 @@ $(document).on('click', '#sendMessage', function() {
         alert('发送消息不能为空');
         return false;
     }
+	/** 命令代码 **/
+	switch(user.text) {
+		case '/help':
+			setHtml.append({
+				name: '管理猿',
+				time: new Date().getTime(),
+				id: "",
+				text: "<p><b>/help</b> - 列出所有命令<p><p><b>/users</b> - 列出所有在线人员</p><p><b>/clear</b> - 清屏</p>"
+			}, function(html) {
+				$('.chatlist').append(html);
+				$('.chatlist')[0].scrollTop = $('.chatlist')[0].scrollHeight;
+			})
+			$('.textarea').val('');
+			$('.textarea')[0].focus();
+			return false;
+		break;
+		case '/users':
+			var onlineText = onlineUsers.filter(function(user){return user}).map(function(user){return '<p class="onlineList">'+user+'</p>'}).join('');
+			setHtml.append({
+				name: '管理猿',
+				time: new Date().getTime(),
+				id: "",
+				text: onlineText
+			}, function(html) {
+				$('.chatlist').append(html);
+				$('.chatlist')[0].scrollTop = $('.chatlist')[0].scrollHeight;
+			})			
+			$('.textarea').val('');
+			$('.textarea')[0].focus();
+			return false;
+		break;
+		case '/clear':
+			$('.chatlist').html($('.chatlist .more'));
+			$('.textarea').val('');
+			$('.textarea')[0].focus();
+			return false;
+		break;
+	}
+	/** 发送消息 **/
     $.ajax({
         url: server+'/p.php?community='+community,
         data: user,
@@ -71,40 +117,50 @@ $(document).on('click', '#sendMessage', function() {
     })
 });
 /** 设置快捷键 **/
-$(document).on('keydown', function(e) {
-    var textarea = $('#chatroom .textarea');
-    (function(key) {
-        chrome.storage.sync.get(key, function(d) {
-            if(!d.hasOwnProperty(key) || d[key] == "0") {
+(function(key) {
+	chrome.storage.sync.get(key, function(d) {
+		if(!d.hasOwnProperty(key) || d[key] == '0') {
+			var quickey = function(e) {
+				if(!$(this).is(':focus')) return false;
+
                 /** Enter 发送消息 **/
-                if(textarea.is(':focus') && !$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
+                if(!$('.atwho-view').is(':focus') && !e.ctrlKey && e.keyCode == '13') {
                     e.preventDefault();
-                    $('#sendMessage').click();
+                    return $('#sendMessage').click();
                 }   
 
                 /** Ctrl+Enter 换行支持 **/
-                if(textarea.is(':focus') && e.ctrlKey && e.keyCode == '13') {
+                if(e.ctrlKey && e.keyCode == '13') {
                     e.preventDefault();
-                    var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
-                    textarea.val(textarea.val().substr(0,start)+'\n'+textarea.val().substr(end));
+                    var start = this.selectionStart, end = this.selectionEnd;
+                    $(this).val($(this).val().substr(0,start)+'\n'+$(this).val().substr(end));
                 }
-            } else {
-
+			}
+		} else {
+			var quickey = function(e) {
                 /** Ctrl+Enter 发送消息 **/
                 if(e.ctrlKey && e.keyCode == '13')
-                    return $('#sendMessage').click();                
-            }
-        })
-    }('sendkey'));
-
+                    return $('#sendMessage').click();   				
+			}
+		}
+		$(document).on('keypress', '#chatroom .textarea', quickey);
+	})
+}('sendkey'));
+$(document).on('keypress', '#chatroom .textarea', function(e) {
     /** Tab支持 **/
-    if(textarea.is(':focus') && e.keyCode == '9') {
+    if($(this).is(':focus') && e.keyCode == '9') {
         e.preventDefault();
-        var start = textarea[0].selectionStart, end = textarea[0].selectionEnd;
-        textarea.val(textarea.val().substr(0,start)+'    '+textarea.val().substr(end));
+        var start = this.selectionStart, end = this.selectionEnd;
+        $(this).val($(this).val().substr(0,start)+'    '+$(this).val().substr(end));
     }
 
-    /** 老板键 **/
+    /** 上键发重复消息 **/
+    if($(this).val() == '' && e.keyCode == '38') {
+    	$(this).val($('.chatlist >li:last-child .content').html());
+    }
+});
+/** 老板键 **/
+$(document).on('keydown', function(e) {
     if(e.ctrlKey && e.keyCode == '38' && !$('#chatroom').hasClass('active')) {
         e.preventDefault();
         setHtml.open();
@@ -129,10 +185,6 @@ $(document).on('click', '#chatroom .more', function() {
         chatlist.prepend(more);
     }, $('.chatlist >li:first-child').attr('data-id'), 40);
 });
-/** 清屏 **/
-$(document).on('click', '#chatroom #clscreen', function() {
-	$('.chatlist').html($('.chatlist .more'));
-})
 /** 粘贴上传图片 **/
 document.body.addEventListener('paste', function(e) {
     var clipboard = e.clipboardData;
@@ -201,6 +253,7 @@ $(document).on('mousemove', function(e) {
     })
 
 });
+
 setHtml = {
     start: function(w) {
         var chatroom = '<div id="chatroom">'+
@@ -220,7 +273,6 @@ setHtml = {
                         '<div class="sendbox">'+
                             '<div class="sendtool">'+
                                 '<span id="embutton">>ω<</span><div id="emlist" class="display"></div>'+
-                                '<span id="clscreen">清</span>'+
                                 '<span id="uploadmessage"></span>'+
                                 '<span id="sendmessage"></span>'+
                             '</div>'+
