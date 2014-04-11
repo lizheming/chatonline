@@ -258,7 +258,7 @@ $(document).on('mousemove', '#chatroom.active', function(e) {
     })
 
 });
-$(document).on('mousedown', '#chatroom', function(e) {
+$(document).on('mousedown', '#chatroom.active', function(e) {
     var chatroom = this;
     var limit = {x:this.offsetLeft+this.clientWidth, y:this.offsetTop}
     var area = {x: limit.x - 10 < e.clientX && limit.x + 10 > e.clientX, y: limit.y - 10 < e.clientY && limit.y + 10 > e.clientY};
