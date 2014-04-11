@@ -222,11 +222,11 @@ document.body.addEventListener('paste', function(e) {
         }
     }
 });
+
 /** 鼠标调整聊天窗口大小 **/
-$(document).on('mousemove', function(e) {
-    var chatroom = document.querySelector('#chatroom.active');
-    if(!chatroom) return false;
-    var mouse = {x: e.pageX, y: e.pageY},
+$(document).on('mousemove', '#chatroom.active', function(e) {
+    var chatroom = this;
+    var mouse = {x: e.clientX, y: e.clientY},
         limit = {x: chatroom.offsetLeft+chatroom.clientWidth, y:chatroom.offsetTop};
     var area = {x: limit.x - 10 < mouse.x && limit.x + 10 > mouse.x, y: limit.y - 10 < mouse.y && limit.y + 10 > mouse.y};
     /** 左右拉伸 **/
@@ -249,7 +249,7 @@ $(document).on('mousemove', function(e) {
     /** 鼠标移除透明对话框 **/
     chrome.storage.sync.get(['aero', 'opacity'], function(d) {
         if(d.aero == "1") {
-            if($(chatroom).hasClass('active') && ( mouse.x > limit.x || mouse.y < limit.y) ) {
+            if($(chatroom).hasClass('active') && ( mouse.clientX > limit.x || mouse.clientY < limit.y) ) {
                 chatroom.style.opacity = d.opacity;
             } else {
                 chatroom.style.opacity = 1;
@@ -258,6 +258,33 @@ $(document).on('mousemove', function(e) {
     })
 
 });
+$(document).on('mousedown', '#chatroom', function(e) {
+    var chatroom = this;
+    var limit = {x:this.offsetLeft+this.clientWidth, y:this.offsetTop}
+    var area = {x: limit.x - 10 < e.clientX && limit.x + 10 > e.clientX, y: limit.y - 10 < e.clientY && limit.y + 10 > e.clientY};
+    if(area.x || area.y) {
+        $('body').append('<style id="user-select">*{-webkit-user-select: none;}</style>');
+        document.onmousemove =  function(e) {
+            /** 左右拉伸 **/
+            if(area.x && !area.y) {
+                chatroom.style.width = e.clientX-chatroom.offsetLeft+'px';
+            }
+            /** 上下拉伸 **/
+            if(!area.x && area.y) {
+                chatroom.style.height = window.screen.availHeight - e.clientY+'px';
+            }
+            /** 对角拉伸 **/
+            if(area.x && area.y) {
+                chatroom.style.width = e.clientX-chatroom.offsetLeft+'px';
+                chatroom.style.height = window.screen.availHeight - e.clientY+'px';
+            }
+        }       
+    }
+})
+$(document).on('mouseup', function() {
+    if($('#user-select').length > 0) $('#user-select').remove();
+    document.onmousemove = null;
+})
 
 setHtml = {
     start: function(w) {

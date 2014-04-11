@@ -8,7 +8,7 @@
 	position:fixed;
 	left: 20px;
 	bottom: -1px;
-	padding: 10px 14px;
+	padding:10px 14px;
 	border: 1px solid #AAA;
 	background: #FEFEFE;
 	color: #333;
@@ -16,11 +16,11 @@
 	transition: all 0.2s;
 	-webkit-transition: all 0.2s;
 }
+#chatroom .header {
+	height: 100%;
+}
 #chatroom:hover {
 	cursor:pointer;	
-}
-#chatroom .header {
-	height:20px;
 }
 #chatroom .status {
 	float:left;
@@ -39,6 +39,9 @@
 	width: 350px;
 	height: 500px;
 }
+#chatroom.active .header {
+	height:3%;
+}
 #chatroom.active i.action {
 	background-position: -100px -100px;
 }
@@ -48,7 +51,7 @@
 
 #chatroom .chatbox {
 	width:100%;
-	height:470px;
+	height:93%;
 }
 #chatroom .chatbox .chatlist {
 	width:100%;
