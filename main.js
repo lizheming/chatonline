@@ -21,9 +21,11 @@ channel = (function() {
                 ch = sae.Channel(res.msg);
                 ch.onmessage = channel.onmessage;
                 ch.onopen = channel.onopen;
+                ch.onclose = channel.onclose;
             })
         },
         onmessage: function(msg) {
+            if(msg.data == 'checkonline') return false;
             html.append($.parseJSON(msg.data), function(text) {
                 $('.chatlist').append(text);
                 $('.chatlist')[0].scrollTop = $('.chatlist')[0].scrollHeight;
@@ -31,7 +33,10 @@ channel = (function() {
             });
         },
         onopen: function() {
-            $.post(server+"connected", {name:user.name});
+            //$.post(server+"connected", {name:user.name});
+        },
+        onclose: function() {
+            $.post(server+"disconnect", {name:user.name});
         },
         send: function(user) {
             $.ajax({
@@ -99,6 +104,7 @@ html = {
                         '</div>'+
                     '</div>';
         $('#chatroom').addClass('active').append(chatbox);
+        if(typeof roomStyle != 'undefined') $('#chatroom').attr('style', roomStyle);
         /** 快捷键显示 **/
         chrome.storage.sync.get('sendkey', function(d){if(d.sendkey == "1") $('#sendMessage h6').html('Ctrl+Enter')})
         /** @ **/
@@ -131,6 +137,8 @@ html = {
     },
     close: function() {
         $('#chatroom').removeClass('active');
+        roomStyle = $('#chatroom').attr('style');
+        $('#chatroom').attr('style', '');
         $('#chatroom .chatbox').remove();
     },
     append: function(data, callback) {
@@ -229,6 +237,7 @@ html = {
 /** 创建通道 **/
 channel.create();
 channel.users(html.start);
+setInterval('channel.users(function(users){html.refresh(users.length)})', 3000);
 
 /** 打开关闭聊天窗口 **/
 $(document).on('click', '.header', function(){
