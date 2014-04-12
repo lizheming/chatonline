@@ -11,7 +11,7 @@ var user = (function() {
 }());
 
 channel = (function() {
-    var community = "segmentfault", root = "http://3.chatonline.sinaapp.com/", server=root+"?community="+community+"&act=";
+    var community = "segmentfault", root = "http://chatonline.sinaapp.com/", server=root+"?community="+community+"&act=";
     return {
         community: community,
         server: root,
@@ -384,7 +384,7 @@ $(document).on('click', '#chatroom .more', function() {
     var more = $(this);
     $(this).remove();
     var chatlist = $('.chatlist'), scrollHeightBefore = chatlist[0].scrollHeight;
-    channel.recent(function() {
+    html.getRecent(function() {
         scrollHeightAfter = chatlist[0].scrollHeight;
         chatlist[0].scrollTop = scrollHeightAfter - scrollHeightBefore;
         chatlist.prepend(more);
