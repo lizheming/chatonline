@@ -1,5 +1,6 @@
 /** global setting **/
 .display {display:none;}
+
 #chatroom .chatlist h1, #chatroom .chatlist h2, #chatroom .chatlist h3, #chatroom .chatlist h4, #chatroom .chatlist h5, #chatroom .chatlist h6 {font-size:14px;margin:0;}
 #chatroom .chatlist img {max-width:100%;}
 #chatroom {
@@ -9,21 +10,22 @@
 	left: 20px;
 	bottom: -1px;
 	padding:10px 14px;
-	border: 1px solid #AAA;
-	background: #FEFEFE;
-	color: #333;
+	background: #FFF;
+	color: #404040;
 	z-index: 999;
-	transition: all 0.2s;
-	-webkit-transition: all 0.2s;
+	transition: height .2s;
+	box-shadow: 0 0 2px rgba(0,0,0,.5);
+	font-family: arial, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif; 
 }
 #chatroom .header {
 	height: 100%;
 }
 #chatroom:hover {
-	cursor:pointer;	
+	cursor:pointer;
 }
 #chatroom .status {
 	float:left;
+	margin: 0 0 0 12px;
 }
 #chatroom i.action {
 	display: inline-block;
@@ -31,16 +33,26 @@
 	height: 16px;
 	background: url(http://img.xiami.net/static/athena/img/sprites.png?v=20140102) no-repeat;
 	background-position: -150px -100px;
-	float:right;
-	margin-top:7px;
+	margin:7px 0 0 7px;
+	vertical-align: middle;
 }
 #chatroom.active {
 	left: -1px;
 	width: 350px;
 	height: 500px;
+	padding: 3em 0 0 13px;
+	box-sizing: border-box;
 }
 #chatroom.active .header {
-	height:3%;
+	top: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+	height: 3em;
+	line-height: 3;
+	box-shadow: 0 2px 0 0 rgba(0,0,0,0.1);
+	background-color: rgba(61,61,61,0.9);
+	color: #FFF;
 }
 #chatroom.active i.action {
 	background-position: -100px -100px;
@@ -50,25 +62,25 @@
 }
 
 #chatroom .chatbox {
-	width:100%;
-	height:93%;
+	height:100%;
 }
 #chatroom .chatbox .chatlist {
 	width:100%;
 	height:77%;
-	padding:0 10px 0 0;
-	margin:5% 0;
+	padding:0 13px 0 0;
+	margin: 0;
 	list-style-type: none;
-	overflow-y:auto;
+	overflow-y: auto;
 	overflow-x: hidden;
 }
 #chatroom .chatbox .chatlist li {
 	margin-bottom:20px;
 }
 #chatroom .chatbox .chatlist li.more {
-	margin:10px 0;
+	padding: 10px;
+	margin: 10px 0 15px;
+	background: #F8F8F8;
 	text-align: center;
-	color:#6495ED;
 }
 #chatroom .chatbox .chatlist .avatar {
 	float:left;
@@ -80,33 +92,66 @@
 	background:green;
 	color:#FFF;
 	border-radius:2px 2px 2px 2px;
+	margin: -1px 7px 0 0;
 }
-#chatroom .chatbox .chatlist em {
+#chatroom .chatbox .chatlist .tri1 ,
+#chatroom .chatbox .chatlist .tri2 {
 	float:left;
 	width:0;
 	height:0;
-	border-top:5px solid #CDE9F5;
-	border-right:5px solid #CDE9F5;
-	border-left:5px solid transparent;
-	border-bottom:5px solid transparent;
+	margin: 10px 0 0 ;
+	border-width: 5px 5px 5px 0 ;
+	border-style: solid solid solid none;
+}
+#chatroom .chatbox .chatlist .tri1 {
+	border-color: transparent #037E8C transparent transparent;
+}
+#chatroom .chatbox .chatlist .tri2 {
+	margin: 10px -2px 0 -4px;
+	border-color: transparent #FFF transparent transparent;
 }
 #chatroom .chatbox .chatlist .body {
-	margin-left:39px;
-	padding:3px 8px;
-	background:#CDE9F5;
+	overflow: hidden;
+	padding:4px 9px 0;
+	background: #FFF;
+	border: 1px solid #037E8C;
+	border-radius: 2px;
 }
+#chatroom .chatbox .chatlist em,
+#chatroom .chatbox .chatlist .body { border-top-color:  }
+
 #chatroom .chatbox .chatlist .head {
-	font-size:12px;
-	line-height:20px;
-	border-bottom:1px solid #EEE;
+	line-height: normal;
+	padding: 3px 0 5px;
+	color: #024959;
 }
 #chatroom .chatbox .chatlist .content {
-	padding-top:10px;
+	padding: 5px 0 0;
 	word-break: break-word;
 }
+#chatroom .chatbox .chatlist .content a {
+	display: block;
+	padding: 3px 6px;
+	background: #FFF;
+	box-shadow: 0 0 2px #BBB;
+}
+#chatroom .chatbox .chatlist .content a:hover{
+	box-shadow: 0 0 7px #BBB;
+	text-decoration: none;
+}
 #chatroom .sendbox {
-	width:100%;
-	height:13%;
+	display: none;
+	position: absolute;
+	left: 0; right: 0;
+	bottom: 0;
+	padding: 13px;
+	height: 8em;
+	background: #FFF;
+	box-shadow: 0 -2px 0 rgba(0,0,0,.1);
+	box-sizing: border-box;
+}
+#chatroom.active  .sendbox {
+	display: block;
 }
 #chatroom .sendbox #embutton {
     margin-right:10px;
@@ -134,21 +179,27 @@
 	background:#EEE;
 }
 #chatroom .sendbox .textarea {
-	float:left;
-	height:80%;
-	width:80%;
+	width:100%;
 	padding:5px;
-	border:1px solid #000;
+	border:1px solid #DDD ;
+	box-sizing: border-box ;
 	background-color: #FFF;
 	overflow: auto;
 	resize: none;
+	margin: 0 0 10px ;
+}
+#chatroom .sendbox .textarea:focus{
+	border-color: #F24C27
 }
 #chatroom .sendbox button {
-	height:80%;
-	width:18%;
-	float:right;
-	padding:15px 0;
-	line-height: 0;
+	padding: .5em 1em;
+	line-height: normal;
+	box-sizing: content-box;
+	height: 1em;
+	background: #F24C27;
+	border: 0 none;
+	color: #FFF;
+	float: right;
 }
 #atwho-container div.atwho-view {
 	z-index:1000;
