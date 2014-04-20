@@ -70,7 +70,7 @@ channel = (function() {
             $.getJSON(server+'recent'+id+'&num='+num, callback);
         },
         filter: function(query, callback) {
-            $.get(server+'filter', {q: query, community: community}, function(o) {o = $.parseJSON(o);if (!o.status) callback(o.data)});
+            $.get(server+'filter', {q: query, community: community}, function(o) {if (!o.status) callback(o.data)});
         }
     };
 })();
