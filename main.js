@@ -89,21 +89,22 @@ html = {
         return $('#chatroom .status span').html(number);
     },
     open: function() {
-        var chatbox = '<div class="chatbox">'+
-                        '<ul class="chatlist">'+
-                            '<li class="loading">正在导入消息请稍后...</li>'+
-                        '</ul>'+
-                    '</div>'+
-                    '<div class="sendbox">'+
-                        '<textarea class="form-control mono textarea-14 mousetrap textarea"></textarea>'+
-                        '<button id="sendMessage">Enter</button>'+
-                        '<div class="sendtool">'+
-                            '<span id="embutton">>ω<</span><div id="emlist" class="display"></div>'+
-                            '<span id="uploadmessage"></span>'+
-                            '<span id="sendmessage"></span>'+
+        var chatbox = '<div class="body">'+
+                        '<div class="chatbox">'+
+                            '<ul class="chatlist">'+
+                                '<li class="loading">正在导入消息请稍后...</li>'+
+                            '</ul>'+
                         '</div>'+
-                    '</div>'
-        ;
+                        '<div class="sendbox">'+
+                            '<textarea class="form-control mono textarea-14 mousetrap textarea"></textarea>'+
+                            '<button id="sendMessage">Enter</button>'+
+                            '<div class="sendtool">'+
+                                '<span id="embutton">>ω<</span><div id="emlist" class="display"></div>'+
+                                '<span id="uploadmessage"></span>'+
+                                '<span id="sendmessage"></span>'+
+                            '</div>'+
+                        '</div>'+
+                      '</div>';
         $('#chatroom').addClass('active').append(chatbox);
         if(typeof roomStyle != 'undefined') $('#chatroom').attr('style', roomStyle);
         /** 快捷键显示 **/
@@ -140,7 +141,7 @@ html = {
         $('#chatroom').removeClass('active');
         roomStyle = $('#chatroom').attr('style');
         $('#chatroom').attr('style', '');
-        $('#chatroom .chatbox').remove();
+        $('#chatroom >.body').remove();
     },
     append: function(data, callback) {
         /** data.text 转义 **/
@@ -167,7 +168,7 @@ html = {
 
         var li = '<li data-time="'+data.time+'" data-id="'+data.id+'">'+
                     '<div class="avatar" data-user="'+data.name+'" style="background:'+bg+';">'+data.name.split("")[0]+'</div>'+
-                    '<em class=tri1></em><em class=tri2></em>'+
+                    '<em class="tri1"></em><em class="tri2"></em>'+
                     '<div class="body">'+
                         '<div class="head">'+ht+'</div>'+
                         '<div class="content">'+data.text+'</div>'+
