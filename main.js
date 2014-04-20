@@ -108,7 +108,7 @@ html = {
         $('#chatroom').addClass('active').append(chatbox);
         if(typeof roomStyle != 'undefined') $('#chatroom').attr('style', roomStyle);
         /** 快捷键显示 **/
-        chrome.storage.sync.get('sendkey', function(d){if(d.sendkey == "1") $('#sendMessage h6').html('Ctrl+Enter')})
+        chrome.storage.sync.get('sendkey', function(d){if(d.sendkey == "1") $('#sendMessage').html('Ctrl+Enter')})
         /** @ **/
         $('.textarea').atwho({
             at: '@',
@@ -133,7 +133,7 @@ html = {
             chrome.storage.sync.get(key, function(d) {
                 if(!d.hasOwnProperty(key)) return false;
                 if($('#msgOption').length > 0) $('#msgOption').remove();
-                $('body').append('<style id="msgOption" type="text/css">#chatroom .chatbox .chatlist em{border-top-color:'+d[key]+';border-right-color:'+d[key]+';}#chatroom .chatbox .chatlist div.body{background:'+d[key]+';}</style>');
+                $('body').append('<style id="msgOption" type="text/css">#chatroom .chatbox .chatlist em.tri2{border-right-color:'+d[key]+';}#chatroom .chatbox .chatlist div.body{background:'+d[key]+';}</style>');
             })
         }('msgbg'));
     },

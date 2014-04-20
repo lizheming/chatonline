@@ -61,7 +61,7 @@
 	-webkit-user-select: none;
 }
 
-#chatroom .chatbox {
+#chatroom >.body, #chatroom .chatbox {
 	height:100%;
 }
 #chatroom .chatbox .chatlist {
@@ -129,12 +129,13 @@
 	padding: 5px 0 0;
 	word-break: break-word;
 }
+/*
 #chatroom .chatbox .chatlist .content a {
 	display: block;
 	padding: 3px 6px;
 	background: #FFF;
 	box-shadow: 0 0 2px #BBB;
-}
+}*/
 #chatroom .chatbox .chatlist .content a:hover{
 	box-shadow: 0 0 7px #BBB;
 	text-decoration: none;
